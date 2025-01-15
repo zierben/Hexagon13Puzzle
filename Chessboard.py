@@ -1,4 +1,6 @@
 from Cell import Cell
+
+
 class Chessboard:
     def __init__(self, size, board):
         self.size = size
@@ -80,47 +82,6 @@ class Chessboard:
     def is_valid(self, v):
         return (self.binary_mask & v) == 0
 
-    def reset(self):
-        self.binary_mask = self.base_mask
-
     def remove(self, v):
         # check if v is in the mask before removing,(self.binary_mask & v) == v 但这样影响效率，默认不增加这步
         self.binary_mask &= ~v
-
-    def _update_board_from_mask(self):
-        for i in range(self.size):
-            for j in range(self.size):
-                if self.binary_mask & (1 << (i * self.size + j)):
-                    self.board[i][j] = 1
-                else:
-                    self.board[i][j] = 0
-
-    def display_board(self):
-        self._update_board_from_mask()
-        for row in self.board:
-            print(row)
-        print('----------')
-
-# chessboard.display_board()
-#
-# # 假设棋子的掩码已经保存在棋子对象中
-# piece_mask = 7 << (4 * size + 4)  # 例如，放置在(4,4)的位置
-#
-# # 放置一个棋子
-# if chessboard.place(piece_mask):
-#     print("棋子已放置")
-# else:
-#     print("无法放置棋子")
-#
-# chessboard.display_board()
-#
-# # 尝试放置一个已经在棋盘上的棋子
-# if chessboard.place(piece_mask):
-#     print("依然可以放置")
-#     chessboard.display_board()
-# else:
-#     print("棋子已经存在，无法放置")
-#
-# # 还原棋局
-# chessboard.reset()
-# chessboard.display_board()

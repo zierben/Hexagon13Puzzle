@@ -1,5 +1,5 @@
 import turtle
-
+from ChessPieceResource import board
 
 class Drawing:
     def __init__(self):
@@ -74,17 +74,6 @@ class Drawing:
                 turtle.write(f"{x},{y}", font=("Arial", 12, "normal"))
 
     def draw_board(self):
-        board = [
-            [1, 1, 1, 1, 0, 0, 0, 0, 0],
-            [1, 1, 1, 0, 0, 0, 0, 0, 0],
-            [1, 1, 0, 0, 0, 0, 0, 0, 0],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [0, 0, 0, 0, 0, 0, 0, 1, 1],
-            [0, 0, 0, 0, 0, 0, 1, 1, 1],
-            [0, 0, 0, 0, 0, 1, 1, 1, 1]
-        ]
         for i, row in enumerate(board):
             for j, cell in enumerate(row):
                 if cell == 0:
@@ -94,3 +83,13 @@ class Drawing:
 
     def change_cell_color(self, x, y, new_color):
         self.draw_three_hexagons_only_edge(x, y, color=new_color)
+
+    def draw_solution(self, solution):
+        turtle.reset()
+        self.draw_board()
+        for i in range(len(solution)):
+            from ChessPiece import ChessPiece
+            shape = ChessPiece.get_shape_from_mask(solution[i])
+            for position in shape:
+                self.change_cell_color(position[0], position[1], i)
+        turtle.update()

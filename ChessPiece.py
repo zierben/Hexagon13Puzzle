@@ -6,6 +6,13 @@ class ChessPiece:
         self.extension_masks = ChessPiece.generate_all_extension_masks(self.shapes)
 
     @staticmethod
+    def generate_base_mask(shape):
+        base_mask = 0
+        for x, y in shape:
+            base_mask |= 1 << (x * ChessPiece.board_size + y)
+        return base_mask
+
+    @staticmethod
     def generate_all_extension_masks(shapes):
         """
         生成所有可能的扩展掩码，表示棋子在棋盘上的不同位置和方向。
