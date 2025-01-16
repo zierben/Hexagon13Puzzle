@@ -1,6 +1,7 @@
 class ChessPiece:
     board_size = 9
     board_mask = 2270874908986167672966671
+
     def __init__(self, shapes):
         self.shapes = shapes
         self.extension_masks = ChessPiece.generate_all_extension_masks(self.shapes)

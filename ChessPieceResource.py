@@ -129,9 +129,6 @@ ChessPieceI = ChessPiece(
      [(0, 1), (1, 0), (1, 1), (2, 1), (3, 1)]]
 )
 
-my_pieces = [ChessPieceL, ChessPieceY, ChessPieceR, ChessPieceB, ChessPieceM, ChessPieceW1,
-          ChessPieceV, ChessPiece1, ChessPiece6, ChessPieceV3, ChessPieceN, ChessPieceW2]
+my_pieces = [ChessPieceL, ChessPieceY, ChessPieceR, ChessPieceB, ChessPieceM, ChessPieceW1, ChessPieceV, ChessPiece1, ChessPiece6, ChessPieceV3, ChessPieceN, ChessPieceW2]
 
-right_pieces = [ChessPieceL, ChessPieceY, ChessPieceR, ChessPieceB, ChessPieceM, ChessPieceW1,
-          ChessPieceV, ChessPiece1, ChessPiece6, ChessPieceV3, ChessPieceN, ChessPieceI]
-
+right_pieces = [ChessPieceL, ChessPieceY, ChessPieceR, ChessPieceB, ChessPieceM, ChessPieceW1, ChessPieceV, ChessPiece1, ChessPiece6, ChessPieceV3, ChessPieceN, ChessPieceI]

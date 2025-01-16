@@ -2,7 +2,14 @@
 # 初始化时，第一个棋子固化，并以移动位数为全局值，执行完一个位置，则返回，重新取第下一个可能的位置，但有可能别的进程已经取了下一个，所以就取更下一个
 import concurrent.futures
 import multiprocessing
+import copy
 from ChessPiece import ChessPiece
+
+
+def writeSolutionsToFile(solution, filename, lock):
+    with lock:
+        with open(filename, 'a') as file:  # 使用追加模式打开文件
+            file.write(f"{solution}\n")  # 将解决方案写入文件，每个解决方案一行
 
 
 def recursion(board, pieces, piece_index, solution, solutions):
@@ -22,37 +29,42 @@ def recursion(board, pieces, piece_index, solution, solutions):
     return solutions
 
 
-def one_process(board, first_piece, pieces, process_sort):
+def one_process(board, first_piece, pieces, shift, shared_solutions, lock, filename):
     # 把第一个piece 按照sort进行位移，然后合成到board中，如果可以合成，则找答案，如果不能合成，则直接返回无解
-    piece_2_add = first_piece << process_sort
-    if board.base_mask & piece_2_add == 0:
-        base_mask = board.base_mask | piece_2_add
-        board_copy = board.copy()
-        board_copy.base_mask = base_mask
-        board_copy.binary_mask = base_mask
-        solutions = recursion(board_copy, pieces, piece_index=0, solution=[], solutions=[])
-        # TODO 每个solution还必须加上第一个元素
-        return solutions
+    print(f"start of the {shift}th process.")
+    piece_to_add = first_piece << shift
+    if board.base_mask & piece_to_add == 0:
+        # 为每一个进程深度copy一个board，并把初始块合并到board中。递归从第二个块开始找
+        base_mask = board.base_mask | piece_to_add
+        board.base_mask = base_mask
+        board.binary_mask = base_mask
+        solutions = recursion(board, pieces, piece_index=0, solution=[], solutions=[])
+        for solution in solutions:
+            solution.insert(0, piece_to_add)
+        shared_solutions.extend(solutions)
+        print(f"finished the {shift}th process, and found {len(solutions)} solutions.")
+        # 在这里写入文件
+        for solution in solutions:
+            writeSolutionsToFile(solution, filename, lock)
     else:
-        return None
+        print(f"finished the {shift}th process, but cannot place it.")
 
 
-def solve(chessboard, pieces):
-    first_piece = ChessPiece.generate_base_mask(pieces[0].shape[0])
+def solve(chessboard, pieces, use_cores, filename):
+    first_piece = ChessPiece.generate_base_mask(pieces[0].shapes[0])
     left_pieces = pieces[1:]
     solutions = []
-    with concurrent.futures.ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
+    with concurrent.futures.ProcessPoolExecutor(max_workers=use_cores) as executor:
         # 创建一个 Manager 来共享数据结构，比如列表
         manager = multiprocessing.Manager()
         shared_solutions = manager.list()
-
+        filelock = manager.Lock()
         # 提交任务到进程池
         futures = []
         for shift in range(1, 81):
             # 为每个进程创建独立的棋盘和棋子副本
-            board_copy = chessboard.copy()
-            pieces_copy = [piece.copy() for piece in left_pieces]
-            future = executor.submit(one_process, board_copy, first_piece, pieces_copy, shift, shared_solutions)
+            board_copy = copy.deepcopy(chessboard)
+            future = executor.submit(one_process, board_copy, first_piece, left_pieces, shift, shared_solutions, filelock, filename)
             futures.append(future)
 
         # 等待所有进程完成
