@@ -1,8 +1,7 @@
 import turtle
-from ChessPieceResource import board
 
 class Drawing:
-    def __init__(self):
+    def __init__(self,board):
         self.colors = [
             (147, 184, 196),  # 深蓝色
             (122, 202, 122),  # 深绿色
@@ -18,6 +17,7 @@ class Drawing:
             (129, 213, 129),  # 深绿色
             (217, 213, 174),  # 深黄色
         ]
+        self.board = board
         self.back = '#eeeeee'
         self.size = 20
         self.size3xstep = 3 * 0.866 * self.size
@@ -74,7 +74,7 @@ class Drawing:
                 turtle.write(f"{x},{y}", font=("Arial", 12, "normal"))
 
     def draw_board(self):
-        for i, row in enumerate(board):
+        for i, row in enumerate(self.board):
             for j, cell in enumerate(row):
                 if cell == 0:
                     self.draw_three_hexagons_only_edge(i, j)

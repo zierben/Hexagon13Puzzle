@@ -12,9 +12,10 @@ def writeSolutionsToFile(solution, filename, lock):
             file.write(f"{solution}\n")  # 将解决方案写入文件，每个解决方案一行
 
 
-def recursion(board, pieces, piece_index, solution, solutions):
+def recursion(board, pieces, piece_index, solution, solutions, filename, lock):
     if piece_index == len(pieces):
         solutions.append(solution.copy())
+        writeSolutionsToFile(solution, filename, lock)
         return
     for mask in pieces[piece_index].extension_masks:
         if board.place(mask):
@@ -23,7 +24,7 @@ def recursion(board, pieces, piece_index, solution, solutions):
                 board.remove(mask)
                 solution.remove(mask)
                 continue
-            recursion(board, pieces, piece_index + 1, solution, solutions)
+            recursion(board, pieces, piece_index + 1, solution, solutions, filename, lock)
             board.remove(mask)
             solution.remove(mask)
     return solutions
@@ -38,14 +39,11 @@ def one_process(board, first_piece, pieces, shift, shared_solutions, lock, filen
         base_mask = board.base_mask | piece_to_add
         board.base_mask = base_mask
         board.binary_mask = base_mask
-        solutions = recursion(board, pieces, piece_index=0, solution=[], solutions=[])
+        solutions = recursion(board, pieces, piece_index=0, solution=[], solutions=[], filename=filename, lock=lock)
         for solution in solutions:
             solution.insert(0, piece_to_add)
         shared_solutions.extend(solutions)
         print(f"finished the {shift}th process, and found {len(solutions)} solutions.")
-        # 在这里写入文件
-        for solution in solutions:
-            writeSolutionsToFile(solution, filename, lock)
     else:
         print(f"finished the {shift}th process, but cannot place it.")
 
